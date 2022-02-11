@@ -21,6 +21,7 @@ namespace Kryptering
             this.password = password;
         }
 
+        
         public void connectToChat(int connectedchat)
         {
             chatid = connectedchat;

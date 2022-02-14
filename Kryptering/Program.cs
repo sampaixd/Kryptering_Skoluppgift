@@ -15,21 +15,18 @@ namespace Kryptering
     internal class Program
     {
         static TcpListener tcplistener;
-        static UserInfo userinfo = new UserInfo();
+        static UserInfo UserInfo = new UserInfo();
+
         static void Main(string[] args)
         {
-            // gets password encryption key
-            StreamReader keyFile = new StreamReader("C:/Kryptering_Pr/key.txt");
-            int passwordKey = int.Parse(keyFile.ReadLine());
-            keyFile.Close();
+            WaitForConnection();
         }
 
-        static void waitForConnection(string[] serverADDR)
+        static void WaitForConnection()
         {
             IPAddress myIP = IPAddress.Parse("127.0.0.1");
             tcplistener = new TcpListener(myIP, 8001);
             tcplistener.Start();
-            List<Thread> connections = new List<Thread>(); 
             while (true)
             {
                 try
@@ -53,14 +50,14 @@ namespace Kryptering
             bool settingUserName = true;
             while (settingUserName)
             { 
-                string username = recvMsg(client);
-                if (userinfo.checkIfTaken(username))
+                string username = SocketComm.RecvMsg(client);
+                if (UserInfo.CheckIfTaken(username))
                 {
                     settingUserName = false;
-                    sendMsg(client, "accepted");
+                    SocketComm.SendMsg(client, "accepted");
                 }
                 else
-                    sendMsg(client, "denied");   
+                    SocketComm.SendMsg(client, "denied");   
             }
             bool settingPassword = true;
             while (settingPassword)
@@ -77,7 +74,7 @@ namespace Kryptering
             bool connected = true;
             while (connected)
             {
-                string msg = recvMsg(client);
+                string msg = SocketComm.RecvMsg(client);
                 switch(msg)
                 {
                     case "create account":
@@ -100,18 +97,35 @@ namespace Kryptering
             }
         }
 
-        static void Login()
+        static void Login(Socket client)
+        {
+            bool loggingin = true;
+            while (loggingin)
+            {
+                string username = SocketComm.RecvMsg(client);
+                if (username == "back")
+                    break;
+                User? user = UserInfo.FindUser(username);
+                if (user == null)
+                    SocketComm.SendMsg(client, "user not found");
+                else           
+                {              
+                    SocketComm.SendMsg(client, "user found");
+                    user.Login(client);
+                    
+                }
+
+            }
+        }
+
+        static void MsgTransaction(string name, string senderADDR, string recvADDR)
         {
 
         }
-        static void msgTransaction(string name, string senderADDR, string recvADDR)
-        {
 
-        }
-
-        static string recvMsg(Socket client)
+       /* static string recvMsg(Socket client)
         {
-            Byte[] msgB = new byte[1024];
+            Byte[] msgB = new byte[256];
             int msgSize = client.Receive(msgB);
             string msg = "";
             for (int i = 0; i < msgSize; i++)
@@ -124,7 +138,7 @@ namespace Kryptering
         {
             Byte[] bSend = System.Text.Encoding.ASCII.GetBytes(msg);
             client.Send(bSend);
-        }
+        }*/
 
 
     }

@@ -25,7 +25,7 @@ namespace Kryptering
                 users.Add(new User(username, encryptedPassword));
             }
         }
-        public bool checkIfTaken(string username)
+        public bool CheckIfTaken(string username)
         {
 
             foreach (User user in users)
@@ -35,7 +35,12 @@ namespace Kryptering
             }
             return true;
         }
-        public void addUser(string newUsername, string newPassword)
+
+        public User FindUser(string name)
+        {
+            return users.Find(user => user.Name.Contains(name));
+        }
+        public void AddUser(string newUsername, string newPassword)
         {
             XmlElement user = userInfo.CreateElement("user");
             userInfo.AppendChild(user);

@@ -5,28 +5,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
-using System.IO;
+
 
 
 namespace Kryptering
 {
-    internal class User
+    internal class User : AesEncryption
     {
-        private static string keyString = GetKey();
-
         static int idCount = 0;
         int id;
         int chatid;
         string name;
         string password;
-        bool loggedin;
+        bool online;
 
-        public User(string name, string password)
+        public User(string name, string password) : base()
         {
             this.id = idCount++;
             this.name = name;
             this.password = password;
-            this.loggedin = false;
+            this.online = false;
         }
 
         
@@ -34,32 +32,39 @@ namespace Kryptering
         {
             chatid = connectedchat;
         }
-        public String Name { get { return name;} }
+        public string Name { get { return name;} }
         public int Id { get { return id;} }
 
+        public bool OnlineStatús { get{ return online; } }
+
+        private bool Online { set { online = value; } }
         public void Login(Socket client)
         {
             int attempts = 0;
             while (attempts < 3)
             {
-                password = SocketComm.RecvMsg(client);
+                string recvPassword = SocketComm.RecvMsg(client);
+                recvPassword = EncryptPassword(recvPassword);
+                if (recvPassword != this.password)
+                {
+                    attempts++;
+                    SocketComm.SendMsg(client, "incorrect");
+                }
 
                 SocketComm.SendMsg(client, "correct");
+                LoggedIn(client);
+                attempts = 4;
             }
+            if (attempts == 3)
+                SocketComm.SendMsg(client, "kicked out");
         }
 
-        private void LoggedIn()
-
-
-        private string GetKey()
+        private void LoggedIn(Socket client)
         {
-            // gets password encryption key
-            StreamReader keyFile = new StreamReader("C:/Kryptering_Pr/key.txt");
-            //byte[] key = new byte[256]; 
-            string keyString = keyFile.ReadLine();
-            keyFile.Close();
-            //key = Encoding.UTF8.GetBytes(keyString);
-            return keyString;
+            Online = true;
         }
+
+
+
     }
 }

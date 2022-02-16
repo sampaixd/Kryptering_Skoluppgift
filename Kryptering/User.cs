@@ -27,17 +27,25 @@ namespace Kryptering
             this.online = false;
         }
 
-        
+        public User(int id, string name, string password)
+        {
+            this.id = id;
+            this.name = name;
+            this.password= password;
+            this.online = false;
+        }
+
         public void ConnectToChat(int connectedchat)
         {
             chatid = connectedchat;
         }
-        public string Name { get { return name;} }
-        public int Id { get { return id;} }
+        public string Name { get { return name; } }
+        public int ID { get { return id; } }
 
-        public bool OnlineStatús { get{ return online; } }
+        static public int IDCount{ get { return idCount; } }
 
-        private bool Online { set { online = value; } }
+        public bool Online { get{ return online; } set { online = value; } }
+
         public void Login(Socket client)
         {
             int attempts = 0;
@@ -50,10 +58,12 @@ namespace Kryptering
                     attempts++;
                     SocketComm.SendMsg(client, "incorrect");
                 }
-
-                SocketComm.SendMsg(client, "correct");
-                LoggedIn(client);
-                attempts = 4;
+                else
+                { 
+                    SocketComm.SendMsg(client, "correct");
+                    LoggedIn(client);
+                    attempts = 4;   // ignores the coming if statement
+                }
             }
             if (attempts == 3)
                 SocketComm.SendMsg(client, "kicked out");
@@ -61,7 +71,26 @@ namespace Kryptering
 
         private void LoggedIn(Socket client)
         {
-            Online = true;
+            
+            this.online = true;
+            SocketComm.SendOnlineStatus(client, ID);
+
+
+            while (this.online)
+            {
+                string command = SocketComm.RecvMsg(client);
+                switch (command)
+                {
+                    case "chatroom":
+                        break;
+
+                    case "logout":
+                        break;
+
+                    default:
+                        break;
+                }
+            }
         }
 
 

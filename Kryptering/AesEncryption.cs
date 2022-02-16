@@ -8,6 +8,19 @@ using System.Security.Cryptography;
 
 namespace Kryptering
 {
+    /*
+     * this class is used to encrypt passwords,
+     * all methods are either protected or private.
+     * This is my attempt to implement access modifiers in
+     * a way that makes the encryption keys as secure as possible.
+     */
+
+    /*  NOTE
+     * I already know that placing keys in a text folder is a terrible decision
+     * however I use it since I had a really hard time finding
+     * a good way of storing them, so except for that part I have
+     * done my best in order to make this class as secure as possible
+     */
     abstract class AesEncryption
     {
         Aes aes;
@@ -40,10 +53,11 @@ namespace Kryptering
             return encryptionVals;
         }
 
-        protected byte[] EncryptPassword(string password)
+        protected string EncryptPassword(string password)
         {
             ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-            byte[] encryptedPassword = new byte[256];
+            byte[] encryptedPasswordBytes = new byte[256];
+            string encryptedPassword = "";
             using (MemoryStream msEncrypt = new MemoryStream())
             {
                 using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
@@ -53,7 +67,10 @@ namespace Kryptering
                         // Write all data to the stream.
                         swEncrypt.Write(password);
                     }
-                    encryptedPassword = msEncrypt.ToArray();
+                    encryptedPasswordBytes = msEncrypt.ToArray();
+                    foreach (byte b in encryptedPasswordBytes) 
+                        encryptedPassword += b; 
+                    
                 }
             }
 

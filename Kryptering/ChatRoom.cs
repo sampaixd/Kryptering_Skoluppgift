@@ -8,5 +8,6 @@ namespace Kryptering
 {
     internal class ChatRoom
     {
+
     }
 }

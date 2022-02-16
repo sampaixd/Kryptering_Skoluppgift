@@ -15,7 +15,6 @@ namespace Kryptering
     internal class Program
     {
         static TcpListener tcplistener;
-        static UserInfo UserInfo = new UserInfo();
 
         static void Main(string[] args)
         {

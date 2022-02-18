@@ -20,15 +20,18 @@ namespace Kryptering
         {
             userInfo = new XmlDocument();
             userInfo.Load("C:/Kryptering_Pr/userInfo.xml");
-            Console.ReadLine();
             List<User> users = new List<User>();
             XmlNodeList extractUserInfo = userInfo.SelectNodes("users/user");
             foreach (XmlNode node in extractUserInfo)
             {
-                int id = Convert.ToInt32(node.SelectSingleNode("userID").InnerText);
+                //int id = Convert.ToInt32(node.SelectSingleNode("userID").InnerText);
                 string username = node.SelectSingleNode("username").InnerText;
                 string encryptedPassword = node.SelectSingleNode("password").InnerText;
-                users.Add(new User(id, username, encryptedPassword));
+                
+                //if (id <= User.IDCount) // to not confuse the static idCount variable
+                    //users.Add(new User(id, username, encryptedPassword)); // unclear if needed
+                //else
+                    users.Add(new User(username, encryptedPassword));
             }
         }
         public static bool CheckIfTaken(string username)
@@ -46,8 +49,10 @@ namespace Kryptering
         {
             return users.Find(user => user.Name.Contains(name));
         }
-        public static void AddUser(int newUserID, string newUsername, string newPassword)
+        public static void AddUser(string newUsername, string newPassword)
         {
+            users.Add(new User(newUsername, newPassword));
+            int newUserID = users.Last().ID;
             XmlElement user = userInfo.CreateElement("user");
             userInfo.AppendChild(user);
             XmlElement userID = userInfo.CreateElement("userID");

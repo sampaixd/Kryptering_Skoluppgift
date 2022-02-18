@@ -27,13 +27,14 @@ namespace Kryptering
             this.online = false;
         }
 
-        public User(int id, string name, string password)
+        // unclear if needed, will still be here for now
+        /*public User(int id, string name, string password): base()
         {
             this.id = id;
             this.name = name;
             this.password= password;
             this.online = false;
-        }
+        }*/
 
         public void ConnectToChat(int connectedchat)
         {
@@ -53,7 +54,7 @@ namespace Kryptering
             {
                 string recvPassword = SocketComm.RecvMsg(client);
                 recvPassword = EncryptPassword(recvPassword);
-                if (recvPassword != this.password)
+                if (recvPassword != password)
                 {
                     attempts++;
                     SocketComm.SendMsg(client, "incorrect");
@@ -72,11 +73,11 @@ namespace Kryptering
         private void LoggedIn(Socket client)
         {
             
-            this.online = true;
+            online = true;
             SocketComm.SendOnlineStatus(client, ID);
 
 
-            while (this.online)
+            while (online)
             {
                 string command = SocketComm.RecvMsg(client);
                 switch (command)
@@ -85,6 +86,8 @@ namespace Kryptering
                         break;
 
                     case "logout":
+                        online = false;
+
                         break;
 
                     default:

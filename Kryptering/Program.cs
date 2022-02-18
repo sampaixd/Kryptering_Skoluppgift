@@ -15,6 +15,7 @@ namespace Kryptering
     internal class Program
     {
         static TcpListener tcplistener;
+        static PasswordEncryptor Encryptor = new PasswordEncryptor();
 
         static void Main(string[] args)
         {
@@ -44,12 +45,15 @@ namespace Kryptering
 
 
         }
-        static void createUser(Socket client)
+        static void CreateUser(Socket client)
         {
             bool settingUserName = true;
             while (settingUserName)
             { 
                 string username = SocketComm.RecvMsg(client);
+                if (username == "exit")
+                    break;
+
                 if (UserInfo.CheckIfTaken(username))
                 {
                     settingUserName = false;
@@ -58,12 +62,8 @@ namespace Kryptering
                 else
                     SocketComm.SendMsg(client, "denied");   
             }
-            bool settingPassword = true;
-            while (settingPassword)
-            {
-
-            }
-
+            string password = SocketComm.RecvMsg(client);
+            password = Encryptor.PublicEncryptPassword(password);
 
 
         }
@@ -77,6 +77,7 @@ namespace Kryptering
                 switch(msg)
                 {
                     case "create account":
+                        CreateUser(client);
                         break;
 
                     case "login":
@@ -121,24 +122,5 @@ namespace Kryptering
         {
 
         }
-
-       /* static string recvMsg(Socket client)
-        {
-            Byte[] msgB = new byte[256];
-            int msgSize = client.Receive(msgB);
-            string msg = "";
-            for (int i = 0; i < msgSize; i++)
-                msg += Convert.ToChar(msgB[i]);
-
-            return msg;
-        }
-
-        static void sendMsg(Socket client, string msg)
-        {
-            Byte[] bSend = System.Text.Encoding.ASCII.GetBytes(msg);
-            client.Send(bSend);
-        }*/
-
-
     }
 }

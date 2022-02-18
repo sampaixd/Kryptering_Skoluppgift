@@ -9,7 +9,7 @@ using System.Net.Sockets;
 namespace Kryptering
 {
     /* 
-     * this class handles all of the socket connections. 
+     * This class handles all of the socket connections. 
      * This includes sending and recieveving data, 
      * as well as doing some more advanced actions
      * such as sending all of the user names and online
@@ -19,7 +19,7 @@ namespace Kryptering
     {
         public static string RecvMsg(Socket client)
         {
-            Byte[] msgB = new byte[256];
+            byte[] msgB = new byte[256];
             int msgSize = client.Receive(msgB);
             string msg = "";
             for (int i = 0; i < msgSize; i++)
@@ -30,7 +30,7 @@ namespace Kryptering
 
         public static void SendMsg(Socket client, string msg)
         {
-            Byte[] bSend = System.Text.Encoding.ASCII.GetBytes(msg);
+            Byte[] bSend = Encoding.UTF8.GetBytes(msg);
             client.Send(bSend);
         }
         public static void SendOnlineStatus(Socket client, int ownId)

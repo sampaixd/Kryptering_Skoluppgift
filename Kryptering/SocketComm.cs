@@ -48,5 +48,23 @@ namespace Kryptering
 
 
         }
+
+        public static void SendChatLogs(Socket client, List<Message> chatLog)
+        {
+            SendMsg(client, Convert.ToString(chatLog.Count));
+            foreach (Message message in chatLog)
+            {
+                SendMsg(client, message.ConvertInfoToString());
+            }
+        }
+
+        public static void SendChatRoomInfo(Socket client, List<string>chatRoomInfo)
+        {
+            
+            SendMsg(client, Convert.ToString(chatRoomInfo.Count));
+            foreach (string roomInfo in chatRoomInfo)
+                SendMsg(client, roomInfo);
+            
+        }
     }
 }

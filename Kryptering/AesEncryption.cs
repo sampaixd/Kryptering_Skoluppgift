@@ -58,6 +58,7 @@ namespace Kryptering
             ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
             byte[] encryptedPasswordBytes = new byte[256];
             string encryptedPassword = "";
+
             using (MemoryStream msEncrypt = new MemoryStream())
             {
                 using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
@@ -70,7 +71,6 @@ namespace Kryptering
                     encryptedPasswordBytes = msEncrypt.ToArray();
                     foreach (byte b in encryptedPasswordBytes) 
                         encryptedPassword += b; 
-                    
                 }
             }
 

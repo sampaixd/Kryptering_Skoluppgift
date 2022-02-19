@@ -14,10 +14,11 @@ namespace Kryptering
     {
         static int idCount = 0;
         int id;
-        int chatid;
+        int chatId;
         string name;
         string password;
         bool online;
+        Socket? clientInfo;
 
         public User(string name, string password) : base()
         {
@@ -26,26 +27,16 @@ namespace Kryptering
             this.password = password;
             this.online = false;
         }
-
-        // unclear if needed, will still be here for now
-        /*public User(int id, string name, string password): base()
-        {
-            this.id = id;
-            this.name = name;
-            this.password= password;
-            this.online = false;
-        }*/
-
-        public void ConnectToChat(int connectedchat)
-        {
-            chatid = connectedchat;
-        }
         public string Name { get { return name; } }
         public int ID { get { return id; } }
 
-        static public int IDCount{ get { return idCount; } }
+        static public int IDCount { get { return idCount; } }
+        public Socket ClientInfo { get { return clientInfo; } }
 
         public bool Online { get{ return online; } set { online = value; } }
+
+
+        
 
         public void Login(Socket client)
         {
@@ -62,7 +53,9 @@ namespace Kryptering
                 else
                 { 
                     SocketComm.SendMsg(client, "correct");
-                    LoggedIn(client);
+                    clientInfo = client;
+                    LoggedIn();
+                    clientInfo = null;    // will automatically reset client info when exiting the "LoggedIn" method
                     attempts = 4;   // ignores the coming if statement
                 }
             }
@@ -70,19 +63,20 @@ namespace Kryptering
                 SocketComm.SendMsg(client, "kicked out");
         }
 
-        private void LoggedIn(Socket client)
+        private void LoggedIn()
         {
             
             online = true;
-            SocketComm.SendOnlineStatus(client, ID);
+            SocketComm.SendOnlineStatus(clientInfo, ID);
 
 
             while (online)
             {
-                string command = SocketComm.RecvMsg(client);
+                string command = SocketComm.RecvMsg(clientInfo);
                 switch (command)
                 {
                     case "chatroom":
+                        SelectChatRoom();
                         break;
 
                     case "logout":
@@ -93,6 +87,18 @@ namespace Kryptering
                     default:
                         break;
                 }
+            }
+        }
+
+        private void SelectChatRoom()
+        {
+            SocketComm.SendChatRoomInfo(clientInfo, ChatRoomManager.FormatChatRoomsToString()); // sends chatroom info to user
+            string selectedChatRoomString = SocketComm.RecvMsg(clientInfo);
+            if (selectedChatRoomString != "back")
+            {
+                int selectedChatRoom = int.Parse(selectedChatRoomString);
+                chatId = selectedChatRoom;
+                ChatRoomManager.
             }
         }
 

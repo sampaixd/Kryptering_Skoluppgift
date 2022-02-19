@@ -8,10 +8,6 @@ namespace Kryptering
 {
     internal class PasswordEncryptor : AesEncryption
     {
-        /*
-         * this class does stuff
-         * :)
-         */
         public PasswordEncryptor() : base()
         { }
         public string PublicEncryptPassword(string password)

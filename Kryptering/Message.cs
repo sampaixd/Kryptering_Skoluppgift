@@ -8,16 +8,21 @@ namespace Kryptering
 {
     internal class Message
     {
+        int messageId;
         string message;
         string senderName;
         int chatId;
 
-        public Message(string message, string senderName, int chatId)
+        public Message(string senderName, string message, int msgId)
         {
+            this.messageId = msgId;
             this.message = message;
             this.senderName = senderName;
-            this.chatId = chatId;
         }
 
+        public string ConvertInfoToString() // used for sending 
+        {
+            return $"{messageId}|{message}|{senderName}";
+        }
     }
 }

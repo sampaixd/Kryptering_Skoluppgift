@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,19 +11,25 @@ namespace Kryptering
     internal class ChatRoomManager
     {
         static List<ChatRoom> chatRooms = new List<ChatRoom>();
-        static List<Message> incomgMsg = new List<Message>();
 
-
-        public void LoadAllChatLogs()
+        static ChatRoomManager()    // loads all the existing chat rooms
         {
-            XmlDocument chatLogs = new XmlDocument();
-            chatLogs.Load("C:/Kryptering_Pr/chatLogs.xml");
-            List<User> users = new List<User>();
-            XmlNodeList extractUserInfo = chatLogs.SelectNodes("users/user");
-            foreach (ChatRoom chatRoom in chatRooms)
-            {
+            int existingChatRooms = 0;
+            while (File.Exists($"C:/Kryptering_Pr/chatLog{existingChatRooms++}.xml"))   
+                chatRooms.Add(new ChatRoom());
 
-            }
+        }
+        public static void CreateNewChatRoom()
+        {
+            chatRooms.Add(new ChatRoom());
+        }
+
+        public static List<string> FormatChatRoomsToString()
+        {
+            List<string> chatRoomInfo = new List<string>();
+            foreach (ChatRoom chatRoom in chatRooms)
+                chatRoomInfo.Add(chatRoom.FormatChatRoomInfoToString());
+            return chatRoomInfo;
         }
 
     }

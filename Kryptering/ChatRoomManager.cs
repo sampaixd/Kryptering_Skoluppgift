@@ -32,5 +32,21 @@ namespace Kryptering
             return chatRoomInfo;
         }
 
+        public static int? JoinChatRoom(User user, int chatRoomId)
+        {
+            return chatRooms[chatRoomId].ConnectToChat(user);
+        }
+
+        public static void LeaveChatRoom(User user, int chatRoomId)
+        {
+            chatRooms[chatRoomId].DisconnectFromChat(user);
+        }
+
+        public static void SendMsg(User user, string msg)
+        {
+            chatRooms[user.ChatId].MsgTransaction(user, msg);
+        }
+
+
     }
 }

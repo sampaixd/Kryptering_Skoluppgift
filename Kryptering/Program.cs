@@ -54,7 +54,7 @@ namespace Kryptering
                 if (username == "exit")
                     break;
 
-                if (UserInfo.CheckIfTaken(username))
+                if (!UserInfo.CheckIfNameIsTaken(username))
                 {
                     settingUserName = false;
                     SocketComm.SendMsg(client, "accepted");
@@ -81,9 +81,7 @@ namespace Kryptering
                         break;
 
                     case "login":
-                        break;
-
-                    case "logout":
+                        Login(client);
                         break;
 
                     case "quit":
@@ -91,8 +89,6 @@ namespace Kryptering
                         connected = false;
                         break;
 
-                    case "chat":
-                        break;
                 }
             }
         }

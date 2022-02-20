@@ -30,7 +30,7 @@ namespace Kryptering
 
         public static void SendMsg(Socket client, string msg)
         {
-            Byte[] bSend = Encoding.UTF8.GetBytes(msg);
+            byte[] bSend = Encoding.UTF8.GetBytes(msg);
             client.Send(bSend);
         }
         public static void SendOnlineStatus(Socket client, int ownId)

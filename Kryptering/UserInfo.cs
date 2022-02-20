@@ -34,15 +34,15 @@ namespace Kryptering
                     users.Add(new User(username, encryptedPassword));
             }
         }
-        public static bool CheckIfTaken(string username)
+        public static bool CheckIfNameIsTaken(string username)
         {
 
             foreach (User user in users)
             {
                 if (user.Name == username)
-                    return false;
+                    return true;
             }
-            return true;
+            return false;
         }
 
         public static User FindUser(string name)
@@ -55,6 +55,7 @@ namespace Kryptering
             int newUserID = users.Last().ID;
             XmlElement user = userInfo.CreateElement("user");
             userInfo.AppendChild(user);
+
             XmlElement userID = userInfo.CreateElement("userID");
             userID.InnerText = Convert.ToString(newUserID);
             userInfo.AppendChild(userID);
@@ -65,7 +66,7 @@ namespace Kryptering
 
             XmlElement password = userInfo.CreateElement("password");
             password.InnerText = newPassword;
-            user.AppendChild(password);
+            userInfo.AppendChild(password);
             
         }
 

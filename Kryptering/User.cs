@@ -14,7 +14,7 @@ namespace Kryptering
     {
         static int idCount = 0;
         int id;
-        int chatId;
+        int? chatId;
         string name;
         string password;
         bool online;
@@ -29,25 +29,22 @@ namespace Kryptering
         }
         public string Name { get { return name; } }
         public int ID { get { return id; } }
-
         static public int IDCount { get { return idCount; } }
         public Socket ClientInfo { get { return clientInfo; } }
-
         public bool Online { get{ return online; } set { online = value; } }
-
-
+        public int ChatId { get { return chatId; } }
         
 
         public void Login(Socket client)
         {
-            int attempts = 0;
-            while (attempts < 3)
+            int passwordAttempts = 0;
+            while (passwordAttempts < 3)
             {
                 string recvPassword = SocketComm.RecvMsg(client);
                 recvPassword = EncryptPassword(recvPassword);
                 if (recvPassword != password)
                 {
-                    attempts++;
+                    passwordAttempts++;
                     SocketComm.SendMsg(client, "incorrect");
                 }
                 else
@@ -56,11 +53,8 @@ namespace Kryptering
                     clientInfo = client;
                     LoggedIn();
                     clientInfo = null;    // will automatically reset client info when exiting the "LoggedIn" method
-                    attempts = 4;   // ignores the coming if statement
                 }
             }
-            if (attempts == 3)
-                SocketComm.SendMsg(client, "kicked out");
         }
 
         private void LoggedIn()
@@ -97,10 +91,32 @@ namespace Kryptering
             if (selectedChatRoomString != "back")
             {
                 int selectedChatRoom = int.Parse(selectedChatRoomString);
-                chatId = selectedChatRoom;
-                ChatRoomManager.
+                chatId = ChatRoomManager.JoinChatRoom(this, selectedChatRoom);
+                if (chatId == null)
+                    SocketComm.SendMsg(clientInfo, "failed");
+                else
+                    SocketComm.SendMsg(clientInfo, "success");
+
             }
         }
+
+        private void ListenForData()
+        {
+            string incomingData = SocketComm.RecvMsg(clientInfo);
+            if (incomingData != "evael/")   // encrypted command for leaving chatroom
+            {
+                
+                ChatRoomManager.SendMsg(this, incomingData);
+            }
+            else
+            {
+                ChatRoomManager.DisconnectFrom
+            }
+                
+
+        }
+
+
 
 
 

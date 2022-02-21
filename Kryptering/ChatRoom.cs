@@ -16,23 +16,29 @@ namespace Kryptering
         List<User> connectedUsers = new List<User>();
         List<Message> msgLog = new List<Message>();
         XmlDocument xmlChatLog;
+        XmlTextWriter xmlChatLogWriter;
+        string path;
+
 
         public ChatRoom()
         {
             this.msgIdCounter = 0;
             this.chatId = chatIdCounter++;
+            this.path = $"C:/Kryptering_Pr/chatLog{chatId}.xml";    // put in place for easier testing
             this.xmlChatLog = new XmlDocument();
-            if (!File.Exists($"C:/Kryptering_Pr/chagLog{chatId}.xml"))
+            this.xmlChatLogWriter = new XmlTextWriter(path, Encoding.UTF8);
+
+            if (!File.Exists(path))
                 CreateXmlFile();
 
-            xmlChatLog.Load($"C:/Kryptering_Pr/chagLog{chatId}.xml");
+            xmlChatLog.Load(path);
             msgLog = GetChatLog();
         }
         /* gets all the messages from the chatlog and puts it into a list */
         private List<Message> GetChatLog()
         {
             List<Message> messages = new List<Message>();
-            XmlNodeList extractChatLog = xmlChatLog.SelectNodes("messages/message");
+            XmlNodeList extractChatLog = xmlChatLog.SelectNodes(path);
             foreach (XmlNode node in extractChatLog)
             {
 
@@ -46,12 +52,15 @@ namespace Kryptering
 
         private void CreateXmlFile()
         {
-            XmlTextWriter writer = new XmlTextWriter($"chatlog{chatId}.xml", Encoding.UTF8);
+            XmlDeclaration xmldeclaration = xmlChatLog.CreateXmlDeclaration("1.0", "utf-8", null);
+            xmlChatLog.AppendChild(xmldeclaration);
+            xmlChatLog.Save(path);
         }
 
         public void MsgTransaction(User sender, string msg)
         {
             msgLog.Add(new Message(sender.Name, msg, msgIdCounter++));
+            AddChatMsgToXml(msgLog.Last());
             foreach (User user in connectedUsers)
                 if (user != sender)     // makes sure that the sender doesnt get their own message sent back
                     SocketComm.SendMsg(user.ClientInfo, msgLog.Last().ConvertInfoToString());
@@ -92,17 +101,21 @@ namespace Kryptering
 
         public void AddChatMsgToXml(Message newMessage)
         {
+            XmlElement messsage = xmlChatLog.CreateElement("message");
+            xmlChatLog.AppendChild(messsage);
 
             XmlElement senderName = xmlChatLog.CreateElement("senderName");
-            xmlChatLog.AppendChild(senderName);
+            messsage.AppendChild(senderName);
 
             XmlElement msgContent = xmlChatLog.CreateElement("msgContent");
             msgContent.InnerText = newMessage.MessageContent;
-            xmlChatLog.AppendChild(msgContent);
+            messsage.AppendChild(msgContent);
 
             XmlElement msgId = xmlChatLog.CreateElement("msgId");
             msgId.InnerText = Convert.ToString(newMessage.MessageId);
-            xmlChatLog.AppendChild(msgId);
+            messsage.AppendChild(msgId);
+
+            xmlChatLog.Save(path);
         }
     }
 }

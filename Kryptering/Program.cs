@@ -34,6 +34,7 @@ namespace Kryptering
                     Console.WriteLine("Waiting for connection...");
                     Socket client = tcplistener.AcceptSocket();
                     Thread thread = new Thread(() => handleClient(client));
+                    Console.WriteLine("User connected");
                     thread.Start();
                 }
 

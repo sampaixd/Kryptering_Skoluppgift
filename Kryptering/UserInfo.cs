@@ -21,16 +21,12 @@ namespace Kryptering
             userInfo = new XmlDocument();
             userInfo.Load("C:/Kryptering_Pr/userInfo.xml");
             List<User> users = new List<User>();
-            XmlNodeList extractUserInfo = userInfo.SelectNodes("users/user");
+            XmlNodeList extractUserInfo = userInfo.SelectNodes("media/user");
             foreach (XmlNode node in extractUserInfo)
             {
-                //int id = Convert.ToInt32(node.SelectSingleNode("userID").InnerText);
                 string username = node.SelectSingleNode("username").InnerText;
                 string encryptedPassword = node.SelectSingleNode("password").InnerText;
                 
-                //if (id <= User.IDCount) // to not confuse the static idCount variable
-                    //users.Add(new User(id, username, encryptedPassword)); // unclear if needed
-                //else
                     users.Add(new User(username, encryptedPassword));
             }
         }
@@ -53,21 +49,25 @@ namespace Kryptering
         {
             users.Add(new User(newUsername, newPassword));
             int newUserID = users.Last().ID;
+
+            XmlElement userXml = userInfo.CreateElement("user");
+            userInfo.AppendChild(userXml);
+
             XmlElement user = userInfo.CreateElement("user");
-            userInfo.AppendChild(user);
+            userXml.AppendChild(user);
 
             XmlElement userID = userInfo.CreateElement("userID");
             userID.InnerText = Convert.ToString(newUserID);
-            userInfo.AppendChild(userID);
+            userXml.AppendChild(userID);
 
             XmlElement username = userInfo.CreateElement("username");
             username.InnerText = newUsername;
-            userInfo.AppendChild(username); 
+            userXml.AppendChild(username); 
 
             XmlElement password = userInfo.CreateElement("password");
             password.InnerText = newPassword;
-            userInfo.AppendChild(password);
-            
+            userXml.AppendChild(password);
+            userInfo.Save("C:/Kryptering_Pr/userInfo.xml");
         }
 
         public static List<string> GetAllOnlineStatus()

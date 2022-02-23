@@ -32,7 +32,7 @@ namespace Kryptering
         static public int IDCount { get { return idCount; } }
         public Socket ClientInfo { get { return clientInfo; } }
         public bool Online { get{ return online; } set { online = value; } }
-        public int ChatId { get { return chatId; } }
+        public int? ChatId { get { return chatId; } }
         
 
         public void Login(Socket client)
@@ -53,6 +53,7 @@ namespace Kryptering
                     clientInfo = client;
                     LoggedIn();
                     clientInfo = null;    // will automatically reset client info when exiting the "LoggedIn" method
+                    passwordAttempts = 3;
                 }
             }
         }
@@ -110,15 +111,29 @@ namespace Kryptering
             }
             else
             {
-                ChatRoomManager.DisconnectFrom
+                AttemptToDisconnectFromChat();
             }
-                
-
         }
+        private void AttemptToDisconnectFromChat()
+        {
+            try
+            {
+                if (chatId == null)
+                {
+                    throw new Exception("Attempted disconnecting when not connected to a chat room");
+                }
+                else
+                {
+                    int tempChatId = Convert.ToInt32(chatId);   // program would not run if the sent int was nullable
+                    ChatRoomManager.LeaveChatRoom(this, tempChatId);
+                    chatId = null;
 
-
-
-
-
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
     }
 }

@@ -19,13 +19,23 @@ namespace Kryptering
     {
         public static string RecvMsg(Socket client)
         {
+            try
+            { 
             byte[] msgB = new byte[256];
             int msgSize = client.Receive(msgB);
             string msg = "";
             for (int i = 0; i < msgSize; i++)
                 msg += Convert.ToChar(msgB[i]);
+            Console.WriteLine($"{client.RemoteEndPoint} says {msg}");
 
             return msg;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                client.Close();
+                return "";
+            }
         }
 
         public static void SendMsg(Socket client, string msg)
@@ -37,34 +47,29 @@ namespace Kryptering
         {
             List<string> allOnlineStatus = new List<string>();
             allOnlineStatus = UserInfo.GetAllOnlineStatus();
-            string userCount = Convert.ToString(User.IDCount - 1);
-            SendMsg(client, userCount); // tells the client how many times they will recieve data
             int currentUserID = 0;
             foreach (string onlineStatus in allOnlineStatus)
             {
                 if (currentUserID != ownId) // does not send the client information about themselves
                     SendMsg(client, onlineStatus);
             }
-
-
+            SendMsg(client, "end");
         }
 
         public static void SendChatLogs(Socket client, List<Message> chatLog)
         {
-            SendMsg(client, Convert.ToString(chatLog.Count));
             foreach (Message message in chatLog)
             {
                 SendMsg(client, message.ConvertInfoToString());
             }
+            SendMsg(client, "end");
         }
 
         public static void SendChatRoomInfo(Socket client, List<string>chatRoomInfo)
         {
-            
-            SendMsg(client, Convert.ToString(chatRoomInfo.Count));
             foreach (string roomInfo in chatRoomInfo)
                 SendMsg(client, roomInfo);
-            
+            SendMsg(client, "end");
         }
     }
 }

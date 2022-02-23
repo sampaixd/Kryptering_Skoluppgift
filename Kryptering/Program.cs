@@ -34,7 +34,7 @@ namespace Kryptering
                     Console.WriteLine("Waiting for connection...");
                     Socket client = tcplistener.AcceptSocket();
                     Thread thread = new Thread(() => handleClient(client));
-                    Console.WriteLine("User connected");
+                    Console.WriteLine($"{client.RemoteEndPoint} connected");
                     thread.Start();
                 }
 
@@ -45,6 +45,32 @@ namespace Kryptering
             }
 
 
+        }
+
+        static void handleClient(Socket client)
+        {
+            bool connected = true;
+            while (connected)
+            {
+                string msg = SocketComm.RecvMsg(client);
+                switch (msg)
+                {
+                    case "create account":
+                        CreateUser(client);
+                        break;
+
+                    case "login":
+                        Login(client);
+                        break;
+
+                    case "quit":
+                        Console.WriteLine($"{client.RemoteEndPoint} disconnected");
+                        client.Close();
+                        connected = false;
+                        break;
+
+                }
+            }
         }
         static void CreateUser(Socket client)
         {
@@ -69,31 +95,6 @@ namespace Kryptering
 
         }
 
-        static void handleClient(Socket client)
-        {
-            bool connected = true;
-            while (connected)
-            {
-                string msg = SocketComm.RecvMsg(client);
-                switch(msg)
-                {
-                    case "create account":
-                        CreateUser(client);
-                        break;
-
-                    case "login":
-                        Login(client);
-                        break;
-
-                    case "quit":
-                        tcplistener.Stop();
-                        connected = false;
-                        break;
-
-                }
-            }
-        }
-
         static void Login(Socket client)
         {
             bool loggingin = true;
@@ -104,10 +105,10 @@ namespace Kryptering
                     break;
                 User? user = UserInfo.FindUser(username);
                 if (user == null)
-                    SocketComm.SendMsg(client, "user not found");
+                    SocketComm.SendMsg(client, "accepted");
                 else           
                 {              
-                    SocketComm.SendMsg(client, "user found");
+                    SocketComm.SendMsg(client, "denied");
                     user.Login(client);
                     
                 }

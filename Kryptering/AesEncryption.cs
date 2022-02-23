@@ -43,11 +43,13 @@ namespace Kryptering
             string ivString = keyFile.ReadLine();
             keyFile.Close();
 
-            byte[] keyBytes = new byte[256];
-            byte[] ivBytes = new byte[256];
+            byte[] keyBytes = new byte[32];
+            byte[] ivBytes = new byte[16];
 
+            //Console.WriteLine($"Keystring: {keyString}\nIVstring: {ivString}");
             keyBytes = Encoding.UTF8.GetBytes(keyString);
             ivBytes = Encoding.UTF8.GetBytes(ivString);
+            Console.WriteLine($"keybytes length: {keyBytes.Length}\nivbytes length: {ivBytes.Length}");
 
             byte[][] encryptionVals = {keyBytes, ivBytes};
             return encryptionVals;

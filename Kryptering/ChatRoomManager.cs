@@ -44,7 +44,22 @@ namespace Kryptering
 
         public static void SendMsg(User user, string msg)
         {
-            chatRooms[user.ChatId].MsgTransaction(user, msg);
+            try
+            { 
+                if (user.ChatId ==  null)
+                {
+                    throw new Exception("User is not connected to a chat room");
+                }
+                else
+                {
+                    int tempChatId = Convert.ToInt32(user.ChatId);
+                    chatRooms[tempChatId].MsgTransaction(user, msg);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
 

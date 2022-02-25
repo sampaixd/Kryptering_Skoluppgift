@@ -65,8 +65,9 @@ namespace Kryptering
             SendMsg(client, "end");
         }
 
-        public static void SendChatRoomInfo(Socket client, List<string>chatRoomInfo)
+        public static void SendAllChatRoomInfo(Socket client)
         {
+            List<string> chatRoomInfo = ChatRoomManager.FormatChatRoomsToString();
             foreach (string roomInfo in chatRoomInfo)
                 SendMsg(client, roomInfo);
             SendMsg(client, "end");

@@ -63,6 +63,7 @@ namespace Kryptering
             
             online = true;
             SocketComm.SendOnlineStatus(clientInfo, ID);
+            SocketComm.SendAllChatRoomInfo(clientInfo);
 
 
             while (online)
@@ -87,7 +88,7 @@ namespace Kryptering
 
         private void SelectChatRoom()
         {
-            SocketComm.SendChatRoomInfo(clientInfo, ChatRoomManager.FormatChatRoomsToString()); // sends chatroom info to user
+            SocketComm.SendChatRoomInfo(clientInfo); // sends chatroom info to user
             string selectedChatRoomString = SocketComm.RecvMsg(clientInfo);
             if (selectedChatRoomString != "back")
             {
@@ -107,7 +108,7 @@ namespace Kryptering
             if (incomingData != "evael/")   // encrypted command for leaving chatroom
             {
                 
-                ChatRoomManager.SendMsg(this, incomingData);
+                ChatRoomManager.SendMsgToChatRoom(this, incomingData);
             }
             else
             {

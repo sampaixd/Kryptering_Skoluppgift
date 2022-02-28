@@ -45,11 +45,11 @@ namespace Kryptering
                 if (recvPassword != password)
                 {
                     passwordAttempts++;
-                    SocketComm.SendMsg(client, "incorrect");
+                    SocketComm.SendMsg(client, "denied");
                 }
                 else
                 { 
-                    SocketComm.SendMsg(client, "correct");
+                    SocketComm.SendMsg(client, "accepted");
                     clientInfo = client;
                     LoggedIn();
                     clientInfo = null;    // will automatically reset client info when exiting the "LoggedIn" method
@@ -63,7 +63,7 @@ namespace Kryptering
             
             online = true;
             SocketComm.SendOnlineStatus(clientInfo, ID);
-
+            SocketComm.SendChatRoomInfo(clientInfo);
 
             while (online)
             {
@@ -87,17 +87,23 @@ namespace Kryptering
 
         private void SelectChatRoom()
         {
-            SocketComm.SendChatRoomInfo(clientInfo, ChatRoomManager.FormatChatRoomsToString()); // sends chatroom info to user
-            string selectedChatRoomString = SocketComm.RecvMsg(clientInfo);
-            if (selectedChatRoomString != "back")
-            {
-                int selectedChatRoom = int.Parse(selectedChatRoomString);
+            bool selectingChatRoom = true;
+            while (selectingChatRoom)
+            { 
+                int selectedChatRoom = Convert.ToInt32(SocketComm.RecvMsg(clientInfo));
+                if (selectedChatRoom == -2)
+                    return;
+                else if (selectedChatRoom == -1)
+                { 
+                    ChatRoomManager.CreateNewChatRoom();
+                    continue;
+                }
+
                 chatId = ChatRoomManager.JoinChatRoom(this, selectedChatRoom);
                 if (chatId == null)
-                    SocketComm.SendMsg(clientInfo, "failed");
+                    SocketComm.SendMsg(clientInfo, "denied");
                 else
-                    SocketComm.SendMsg(clientInfo, "success");
-
+                    SocketComm.SendMsg(clientInfo, "accepted");
             }
         }
 

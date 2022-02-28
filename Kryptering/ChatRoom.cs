@@ -34,11 +34,20 @@ namespace Kryptering
             xmlChatLog.Load(path);
             msgLog = GetChatLog();
         }
-        /* gets all the messages from the chatlog and puts it into a list */
+
+        private void CreateXmlFile()
+        {
+            XmlDeclaration xmldeclaration = xmlChatLog.CreateXmlDeclaration("1.0", "utf-8", null);
+            xmlChatLog.AppendChild(xmldeclaration);
+            XmlElement messages = xmlChatLog.CreateElement("messages");
+            messages.AppendChild(messages);
+            xmlChatLog.Save(path);
+        }
+
         private List<Message> GetChatLog()
         {
             List<Message> messages = new List<Message>();
-            XmlNodeList extractChatLog = xmlChatLog.SelectNodes(path);
+            XmlNodeList extractChatLog = xmlChatLog.SelectNodes("messages/message");
             foreach (XmlNode node in extractChatLog)
             {
 
@@ -50,12 +59,6 @@ namespace Kryptering
             return messages;
         }
 
-        private void CreateXmlFile()
-        {
-            XmlDeclaration xmldeclaration = xmlChatLog.CreateXmlDeclaration("1.0", "utf-8", null);
-            xmlChatLog.AppendChild(xmldeclaration);
-            xmlChatLog.Save(path);
-        }
 
         public void MsgTransaction(User sender, string msg)
         {
@@ -101,8 +104,9 @@ namespace Kryptering
 
         public void AddChatMsgToXml(Message newMessage)
         {
+            XmlElement messages = xmlChatLog.DocumentElement;
             XmlElement messsage = xmlChatLog.CreateElement("message");
-            xmlChatLog.AppendChild(messsage);
+            messages.AppendChild(messsage);
 
             XmlElement senderName = xmlChatLog.CreateElement("senderName");
             messsage.AppendChild(senderName);

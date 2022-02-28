@@ -40,6 +40,7 @@ namespace Kryptering
 
         public static void SendMsg(Socket client, string msg)
         {
+            Console.WriteLine($"Sending message {msg} to {client.RemoteEndPoint}");
             byte[] bSend = Encoding.UTF8.GetBytes(msg);
             client.Send(bSend);
         }
@@ -52,6 +53,7 @@ namespace Kryptering
             {
                 if (currentUserID != ownId) // does not send the client information about themselves
                     SendMsg(client, onlineStatus);
+                currentUserID++;
             }
             SendMsg(client, "end");
         }
@@ -65,8 +67,9 @@ namespace Kryptering
             SendMsg(client, "end");
         }
 
-        public static void SendChatRoomInfo(Socket client, List<string>chatRoomInfo)
+        public static void SendChatRoomInfo(Socket client)
         {
+            List<string> chatRoomInfo = ChatRoomManager.FormatChatRoomsToString();
             foreach (string roomInfo in chatRoomInfo)
                 SendMsg(client, roomInfo);
             SendMsg(client, "end");

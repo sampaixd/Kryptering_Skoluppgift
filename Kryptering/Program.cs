@@ -74,10 +74,11 @@ namespace Kryptering
         }
         static void CreateUser(Socket client)
         {
+            string username = "";
             bool settingUserName = true;
             while (settingUserName)
             { 
-                string username = SocketComm.RecvMsg(client);
+                username = SocketComm.RecvMsg(client);
                 if (username == "exit")
                     break;
 
@@ -91,7 +92,7 @@ namespace Kryptering
             }
             string password = SocketComm.RecvMsg(client);
             password = Encryptor.PublicEncryptPassword(password);
-
+            UserInfo.AddUser(username, password);
 
         }
 
@@ -105,10 +106,10 @@ namespace Kryptering
                     break;
                 User? user = UserInfo.FindUser(username);
                 if (user == null)
-                    SocketComm.SendMsg(client, "accepted");
+                    SocketComm.SendMsg(client, "denied");
                 else           
                 {              
-                    SocketComm.SendMsg(client, "denied");
+                    SocketComm.SendMsg(client, "accepted");
                     user.Login(client);
                     
                 }

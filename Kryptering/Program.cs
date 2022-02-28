@@ -33,7 +33,7 @@ namespace Kryptering
                 {
                     Console.WriteLine("Waiting for connection...");
                     Socket client = tcplistener.AcceptSocket();
-                    Thread thread = new Thread(() => handleClient(client));
+                    Thread thread = new Thread(() => HandleClient(client));
                     Console.WriteLine($"{client.RemoteEndPoint} connected");
                     thread.Start();
                 }
@@ -47,7 +47,7 @@ namespace Kryptering
 
         }
 
-        static void handleClient(Socket client)
+        static void HandleClient(Socket client)
         {
             bool connected = true;
             while (connected)

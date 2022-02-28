@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using System.Net.Sockets;
 
 namespace Kryptering
 {
@@ -42,7 +43,7 @@ namespace Kryptering
             chatRooms[chatRoomId].DisconnectFromChat(user);
         }
 
-        public static void SendMsg(User user, string msg)
+        public static void SendMsgToChatRoom(User user, string msg)
         {
             try
             { 

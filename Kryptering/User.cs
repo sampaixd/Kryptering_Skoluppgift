@@ -63,7 +63,7 @@ namespace Kryptering
             
             online = true;
             SocketComm.SendOnlineStatus(clientInfo, ID);
-            SocketComm.SendChatRoomInfo(clientInfo);
+            SocketComm.SendAllChatRoomInfo(clientInfo);
 
             while (online)
             {
@@ -113,7 +113,7 @@ namespace Kryptering
             if (incomingData != "evael/")   // encrypted command for leaving chatroom
             {
                 
-                ChatRoomManager.SendMsg(this, incomingData);
+                ChatRoomManager.SendMsgToChatRoom(this, incomingData);
             }
             else
             {

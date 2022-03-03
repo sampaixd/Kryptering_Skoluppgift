@@ -1,20 +1,16 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Net.Sockets;
 
 namespace Kryptering
 {
     internal class ChatRoomManager
     {
-        static List<ChatRoom> chatRooms = new List<ChatRoom>();
+        static List<ChatRoom> chatRooms;
 
         static ChatRoomManager()    // loads all the existing chat rooms
         {
+            chatRooms = new List<ChatRoom>();
             int existingChatRooms = 0;
             while (File.Exists($"C:/Kryptering_Pr/chatLog{existingChatRooms++}.xml"))   
                 chatRooms.Add(new ChatRoom());
@@ -23,6 +19,7 @@ namespace Kryptering
         public static void CreateNewChatRoom()
         {
             chatRooms.Add(new ChatRoom());
+            Console.WriteLine("Created a new chat room");
         }
 
         public static List<string> FormatChatRoomsToString()
@@ -44,23 +41,21 @@ namespace Kryptering
         }
 
         public static void SendMsgToChatRoom(User user, string msg)
-        {
-            try
-            { 
-                if (user.ChatId ==  null)
-                {
-                    throw new Exception("User is not connected to a chat room");
-                }
-                else
-                {
-                    int tempChatId = Convert.ToInt32(user.ChatId);
-                    chatRooms[tempChatId].MsgTransaction(user, msg);
-                }
-            }
-            catch (Exception e)
+        { 
+            if (user.ChatId ==  null)
             {
-                Console.WriteLine(e.Message);
+                throw new ClientNotConnectedToChatRoomException();
             }
+            else
+            {
+                int tempChatId = Convert.ToInt32(user.ChatId);
+                chatRooms[tempChatId].MsgTransaction(user, msg);
+            }
+        }
+
+        public static List<Message> GetChatLog(int roomId)
+        {
+            return chatRooms[roomId].MsgLog;
         }
 
 

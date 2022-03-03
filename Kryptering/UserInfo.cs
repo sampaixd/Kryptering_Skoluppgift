@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace Kryptering
@@ -44,13 +42,11 @@ namespace Kryptering
             XmlNodeList extractUserInfo = userInfo.SelectNodes("users/user");
             foreach (XmlNode node in extractUserInfo)
             {
-                Console.WriteLine("found user");
                 string username = node.SelectSingleNode("username").InnerText;
                 string encryptedPassword = node.SelectSingleNode("password").InnerText;
 
                 tempUsers.Add(new User(username, encryptedPassword));
             }
-            Console.WriteLine(tempUsers.Count);
             return tempUsers;
         }
 

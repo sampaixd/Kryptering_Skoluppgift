@@ -2,8 +2,6 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace Kryptering
@@ -16,7 +14,6 @@ namespace Kryptering
         List<User> connectedUsers = new List<User>();
         List<Message> msgLog = new List<Message>();
         XmlDocument xmlChatLog;
-        XmlTextWriter xmlChatLogWriter;
         string path;
 
 
@@ -26,7 +23,6 @@ namespace Kryptering
             this.chatId = chatIdCounter++;
             this.path = $"C:/Kryptering_Pr/chatLog{chatId}.xml";    // put in place for easier testing
             this.xmlChatLog = new XmlDocument();
-            this.xmlChatLogWriter = new XmlTextWriter(path, Encoding.UTF8);
 
             if (!File.Exists(path))
                 CreateXmlFile();
@@ -35,16 +31,18 @@ namespace Kryptering
             msgLog = GetChatLog();
         }
 
+        public List<Message> MsgLog { get { return msgLog; } }
+
         private void CreateXmlFile()
         {
             XmlDeclaration xmldeclaration = xmlChatLog.CreateXmlDeclaration("1.0", "utf-8", null);
             xmlChatLog.AppendChild(xmldeclaration);
             XmlElement messages = xmlChatLog.CreateElement("messages");
-            messages.AppendChild(messages);
+            xmlChatLog.AppendChild(messages);
             xmlChatLog.Save(path);
         }
 
-        private List<Message> GetChatLog()
+        public List<Message> GetChatLog()
         {
             List<Message> messages = new List<Message>();
             XmlNodeList extractChatLog = xmlChatLog.SelectNodes("messages/message");
@@ -52,7 +50,7 @@ namespace Kryptering
             {
 
                 string username = node.SelectSingleNode("senderName").InnerText;
-                string msgData = node.SelectSingleNode("msgData").InnerText;
+                string msgData = node.SelectSingleNode("msgContent").InnerText;
                 int msgId = Convert.ToInt32(node.SelectSingleNode("msgId").InnerText);
                 messages.Add(new Message(username, msgData, msgIdCounter++));
             }
@@ -62,7 +60,7 @@ namespace Kryptering
 
         public void MsgTransaction(User sender, string msg)
         {
-            msgLog.Add(new Message(sender.Name, msg, msgIdCounter++));
+            msgLog.Add(new Message(msg));
             AddChatMsgToXml(msgLog.Last());
             foreach (User user in connectedUsers)
                 if (user != sender)     // makes sure that the sender doesnt get their own message sent back
@@ -108,18 +106,22 @@ namespace Kryptering
             XmlElement messsage = xmlChatLog.CreateElement("message");
             messages.AppendChild(messsage);
 
+            XmlElement msgId = xmlChatLog.CreateElement("msgId");
+            msgId.InnerText = Convert.ToString(newMessage.MessageId);
+            messsage.AppendChild(msgId);
+
             XmlElement senderName = xmlChatLog.CreateElement("senderName");
+            senderName.InnerText = newMessage.SenderName;
             messsage.AppendChild(senderName);
 
             XmlElement msgContent = xmlChatLog.CreateElement("msgContent");
             msgContent.InnerText = newMessage.MessageContent;
             messsage.AppendChild(msgContent);
 
-            XmlElement msgId = xmlChatLog.CreateElement("msgId");
-            msgId.InnerText = Convert.ToString(newMessage.MessageId);
-            messsage.AppendChild(msgId);
+
 
             xmlChatLog.Save(path);
         }
+
     }
 }

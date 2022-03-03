@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace Kryptering
 {
@@ -30,19 +28,26 @@ namespace Kryptering
 
             return msg;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e.Message);
-                client.Close();
-                return "";
+                throw new ClientDisconnectedException();
             }
         }
 
         public static void SendMsg(Socket client, string msg)
         {
-            Console.WriteLine($"Sending message {msg} to {client.RemoteEndPoint}");
-            byte[] bSend = Encoding.UTF8.GetBytes(msg);
-            client.Send(bSend);
+            try
+            { 
+                Console.WriteLine($"Sending message {msg} to {client.RemoteEndPoint}");
+                byte[] bSend = new byte[256];
+                bSend = Encoding.UTF8.GetBytes(msg);
+                client.Send(bSend); 
+                Thread.Sleep(50);   // avoids multiple messages being sent at once
+            }
+            catch (Exception)
+            {
+                throw new ClientDisconnectedException();
+            }
         }
         public static void SendOnlineStatus(Socket client, int ownId)
         {
@@ -58,8 +63,9 @@ namespace Kryptering
             SendMsg(client, "end");
         }
 
-        public static void SendChatLogs(Socket client, List<Message> chatLog)
+        public static void SendChatLogs(Socket client, int roomId)
         {
+            List<Message> chatLog = ChatRoomManager.GetChatLog(roomId);
             foreach (Message message in chatLog)
             {
                 SendMsg(client, message.ConvertInfoToString());
@@ -71,7 +77,9 @@ namespace Kryptering
         {
             List<string> chatRoomInfo = ChatRoomManager.FormatChatRoomsToString();
             foreach (string roomInfo in chatRoomInfo)
+            { 
                 SendMsg(client, roomInfo);
+            }
             SendMsg(client, "end");
         }
     }

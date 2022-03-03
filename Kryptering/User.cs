@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
 using System.Net.Sockets;
 
 
@@ -68,6 +63,11 @@ namespace Kryptering
             while (online)
             {
                 string command = SocketComm.RecvMsg(clientInfo);
+                if (command == "")
+                { 
+                    online = false;
+                    Console.WriteLine("Connection was severed");
+                }
                 switch (command)
                 {
                     case "chatroom":
@@ -77,6 +77,11 @@ namespace Kryptering
                     case "logout":
                         online = false;
 
+                        break;
+
+                    case "refresh":
+                        SocketComm.SendOnlineStatus(clientInfo, ID);
+                        SocketComm.SendAllChatRoomInfo(clientInfo);
                         break;
 
                     default:
@@ -94,7 +99,7 @@ namespace Kryptering
                 if (selectedChatRoom == -2)
                     return;
                 else if (selectedChatRoom == -1)
-                { 
+                {
                     ChatRoomManager.CreateNewChatRoom();
                     continue;
                 }
@@ -103,22 +108,42 @@ namespace Kryptering
                 if (chatId == null)
                     SocketComm.SendMsg(clientInfo, "denied");
                 else
+                { 
                     SocketComm.SendMsg(clientInfo, "accepted");
+                    SocketComm.SendChatLogs(ClientInfo, Convert.ToInt32(chatId));
+                    ListenForData();
+                    return;
+                }
             }
         }
 
         private void ListenForData()
         {
-            string incomingData = SocketComm.RecvMsg(clientInfo);
-            if (incomingData != "evael/")   // encrypted command for leaving chatroom
-            {
-                
-                ChatRoomManager.SendMsgToChatRoom(this, incomingData);
+            string incomingData = "";
+            bool listening = true;
+            try
+            { 
+                while (listening)
+                { 
+                    incomingData = SocketComm.RecvMsg(clientInfo);
+                    if (incomingData == "evael/")
+                    {     
+                        listening = false;
+                        continue;
+                    }
+                    ChatRoomManager.SendMsgToChatRoom(this, incomingData);
+                }
             }
-            else
+            catch (ClientNotConnectedToChatRoomException)
             {
+                Console.WriteLine("client is not connected to a chat room");
                 AttemptToDisconnectFromChat();
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            AttemptToDisconnectFromChat();
         }
         private void AttemptToDisconnectFromChat()
         {
@@ -126,7 +151,7 @@ namespace Kryptering
             {
                 if (chatId == null)
                 {
-                    throw new Exception("Attempted disconnecting when not connected to a chat room");
+                    throw new ClientNotConnectedToChatRoomException();
                 }
                 else
                 {
@@ -135,6 +160,10 @@ namespace Kryptering
                     chatId = null;
 
                 }
+            }
+            catch (ClientNotConnectedToChatRoomException)
+            {
+                Console.WriteLine("Client is already disconnected from chat room");
             }
             catch (Exception e)
             {

@@ -1,13 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Security.Cryptography;
 using System.Net;
 using System.Net.Sockets;
-using System.Xml;
-using System.IO;
 using System.Threading;
 
 namespace Kryptering
@@ -52,23 +45,38 @@ namespace Kryptering
             bool connected = true;
             while (connected)
             {
-                string msg = SocketComm.RecvMsg(client);
-                switch (msg)
+                try
+                { 
+                    string msg = SocketComm.RecvMsg(client);
+                    switch (msg)
+                    {
+                        case "create account":
+                            CreateUser(client);
+                            break;
+
+                        case "login":
+                            Login(client);
+                            break;
+
+                        case "quit":
+                            Console.WriteLine($"{client.RemoteEndPoint} disconnected");
+                            client.Close();
+                            connected = false;
+                            break;
+
+                    }
+                }
+                catch (ClientDisconnectedException)
                 {
-                    case "create account":
-                        CreateUser(client);
-                        break;
-
-                    case "login":
-                        Login(client);
-                        break;
-
-                    case "quit":
-                        Console.WriteLine($"{client.RemoteEndPoint} disconnected");
-                        client.Close();
-                        connected = false;
-                        break;
-
+                    Console.WriteLine("CLient connection closed unexpectedly");
+                    client.Close();
+                    connected = false;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    client.Close();
+                    connected = false;
                 }
             }
         }
@@ -98,8 +106,8 @@ namespace Kryptering
 
         static void Login(Socket client)
         {
-            bool loggingin = true;
-            while (loggingin)
+            bool loggingIn = true;
+            while (loggingIn)
             {
                 string username = SocketComm.RecvMsg(client);
                 if (username == "back")
@@ -111,6 +119,7 @@ namespace Kryptering
                 {              
                     SocketComm.SendMsg(client, "accepted");
                     user.Login(client);
+                    loggingIn = false;
                     
                 }
 

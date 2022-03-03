@@ -48,6 +48,9 @@
     <Compile Include="ChatRoom.cs" />
     <Compile Include="AesEncryption.cs" />
     <Compile Include="ChatRoomManager.cs" />
+    <Compile Include="ClientDisconnectedException.cs" />
+    <Compile Include="ClientNotConnectedToChatRoomException.cs" />
+    <Compile Include="InputOutOfRangeException.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="PasswordEncryptor.cs" />
     <Compile Include="Program.cs" />

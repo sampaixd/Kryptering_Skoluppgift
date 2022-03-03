@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿
 using System.Text;
-using System.Threading.Tasks;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -24,9 +21,11 @@ namespace Kryptering
     abstract class AesEncryption
     {
         Aes aes;
+        string path;
         
         protected AesEncryption()
         {
+            this.path = "C:/Kryptering_Pr/key.txt";
             this.aes = Aes.Create();
             byte[][] tempByteArray = new byte[2][];
             tempByteArray = GetKeyAndIV();
@@ -38,7 +37,7 @@ namespace Kryptering
         private byte[][] GetKeyAndIV()
         {
             // gets password encryption key
-            StreamReader keyFile = new StreamReader("C:/Kryptering_Pr/key.txt");
+            StreamReader keyFile = new StreamReader(path);
             string keyString = keyFile.ReadLine();
             string ivString = keyFile.ReadLine();
             keyFile.Close();
@@ -49,7 +48,6 @@ namespace Kryptering
             //Console.WriteLine($"Keystring: {keyString}\nIVstring: {ivString}");
             keyBytes = Encoding.UTF8.GetBytes(keyString);
             ivBytes = Encoding.UTF8.GetBytes(ivString);
-            Console.WriteLine($"keybytes length: {keyBytes.Length}\nivbytes length: {ivBytes.Length}");
 
             byte[][] encryptionVals = {keyBytes, ivBytes};
             return encryptionVals;

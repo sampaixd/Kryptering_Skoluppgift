@@ -32,7 +32,7 @@ namespace Kryptering
             XmlDeclaration xmldeclaration = userInfo.CreateXmlDeclaration("1.0", "utf-8", null);
             userInfo.AppendChild(xmldeclaration);
             XmlElement messages = userInfo.CreateElement("messages");
-            messages.AppendChild(messages);
+            userInfo.AppendChild(messages);
             userInfo.Save(path);
         }
 
